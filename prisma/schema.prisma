@@ -1,0 +1,37 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum AccionDispositivo {
+  ENCENDIDO
+  APAGADO
+  ABIERTO
+  CERRADO
+}
+
+model Dispositivo {
+  id                  String   @id @default(uuid())
+  estado              Boolean
+  ultimaActualizacion DateTime @db.DateTime()
+  ultimoAudio         String   @db.VarChar(100)
+  ultimaImagen        String   @db.VarChar(100)
+  ultimaTemperatura   Float
+  temperaturaDeseada  Float
+  descripcion         String
+
+  fk_evento Evento[]
+}
+
+model Evento {
+  id     String            @id @default(uuid())
+  accion AccionDispositivo
+  fecha  DateTime          @db.DateTime()
+
+  id_dispositivo String      @db.VarChar(40)
+  fk_dispositivo Dispositivo @relation(fields: [id_dispositivo], references: [id], onDelete: Cascade)
+}
