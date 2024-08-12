@@ -7,6 +7,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Usuario {
+  id       String @id @default(uuid())
+  usuario  String @unique @db.VarChar(100)
+  password String @db.VarChar(100)
+
+  fk_evento Evento[]
+}
+
 enum AccionDispositivo {
   ENCENDIDO
   APAGADO
@@ -22,6 +30,7 @@ model Dispositivo {
   ultimaImagen        String   @db.VarChar(100)
   ultimaTemperatura   Float
   temperaturaDeseada  Float
+  nivelVoltaje        Float
   descripcion         String
 
   fk_evento Evento[]
@@ -34,4 +43,7 @@ model Evento {
 
   id_dispositivo String      @db.VarChar(40)
   fk_dispositivo Dispositivo @relation(fields: [id_dispositivo], references: [id], onDelete: Cascade)
+
+  id_usuario String?  @db.VarChar(100)
+  fk_usuario Usuario? @relation(references: [id], fields: [id_usuario])
 }
