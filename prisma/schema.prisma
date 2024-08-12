@@ -24,15 +24,16 @@ enum AccionDispositivo {
 
 model Dispositivo {
   id                  String   @id @default(uuid())
+  nombre              String   @unique @db.VarChar(100)
   estado              Boolean
   ultimaActualizacion DateTime @db.DateTime()
-  ultimoAudio         String   @db.VarChar(100)
-  ultimaImagen        String   @db.VarChar(100)
-  ultimaTemperatura   Float
-  temperaturaDeseada  Float
-  nivelVoltaje        Float
-  descripcion         String   @db.VarChar(100)
-  direcccion          String   @db.VarChar(100)
+  ultimoAudio         String?  @db.VarChar(100)
+  ultimaImagen        String?  @db.VarChar(100)
+  ultimaTemperatura   Float?
+  temperaturaDeseada  Float?
+  nivelVoltaje        Float?
+  descripcion         String?  @db.VarChar(100)
+  direcccion          String?  @db.VarChar(100)
 
   fk_evento Evento[]
 }

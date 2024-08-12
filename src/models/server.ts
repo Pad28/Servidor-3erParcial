@@ -3,9 +3,10 @@ import { Server as SocketIOServer } from 'socket.io';
 
 import express, { Application, Router } from 'express';
 import mosca from 'mosca';
-import mqtt from 'mqtt';
 import cors from 'cors';
 import compression from 'compression';
+import { SocketController } from '../controllers/sockets/SocketController';
+import { MqttController } from '../controllers/mqtt/MqttController';
 
 
 interface ServerOptions {
@@ -14,16 +15,12 @@ interface ServerOptions {
     routes: Router;
 }
 
-interface Events {
-
-}
-
 export class Server {
 
     private readonly app: Application;
 
     private readonly server: HttpServer;
-    private readonly webSocket: SocketIOServer;
+    private readonly socketServer: SocketIOServer;
     private readonly broker: mosca.Server;
 
     constructor(
@@ -31,7 +28,7 @@ export class Server {
     ) {
         this.app = express();
         this.server = createServer(this.app);
-        this.webSocket = new SocketIOServer(this.server);
+        this.socketServer = new SocketIOServer(this.server);
         this.broker = new mosca.Server({ port: options.portMqtt });
 
     }
@@ -53,6 +50,12 @@ export class Server {
         this.server.listen(this.options.portApi, () => {
             console.log(`Server listening in port ${this.options.portApi}`);
         });
+
+        new SocketController(this.socketServer, `mqtt://localhost:${this.options.portMqtt}`)
+            .listen();
+
+        new MqttController(this.broker, this.socketServer, `mqtt://localhost:${this.options.portMqtt}`)
+            .listen();
     }
 }
 
