@@ -31,7 +31,8 @@ model Dispositivo {
   ultimaTemperatura   Float
   temperaturaDeseada  Float
   nivelVoltaje        Float
-  descripcion         String
+  descripcion         String   @db.VarChar(100)
+  direcccion          String   @db.VarChar(100)
 
   fk_evento Evento[]
 }
