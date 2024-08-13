@@ -34,6 +34,8 @@ model Dispositivo {
   nivelVoltaje        Float?
   descripcion         String?  @db.VarChar(100)
   direcccion          String?  @db.VarChar(100)
+  ph_agua             Float?
+  nivel_agua          Float?
 
   fk_evento Evento[]
 }

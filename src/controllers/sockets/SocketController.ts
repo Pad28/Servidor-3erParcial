@@ -14,15 +14,32 @@ export class SocketController {
     public async listen() {
         this.socketServer.on("connection", (socket) => {
 
+            // Pedir estado actual del dispositivo
             Object.keys(Dispositivos).forEach(key => {
                 this.get(socket, `LED_GET_ESTADO_${key}`);
             });
 
+            // Pedir informacion del dispositivo desde la base de datos, envia la informacion en formato JSON
+            // Evento para recibir la informacion LED_SEND_INFO_[nombre del dispositivo]
+            Object.keys(Dispositivos).forEach(key => {
+                this.getDb(socket, `LED_GET_INFO_${key}`);
+            });
+
+            // Invierte el estado del dispositivo(true/false), como payload recibe uno de estos valores:
+            //   ENCENDIDO
+            //   APAGADO
+            //   ABIERTO
+            //   CERRADO
+            // El MQTT tiene que estar subscrito a un topic con el mismo nombre
             Object.keys(Dispositivos).forEach(key => {
                 this.set(socket, `LED_SET_ESTADO_${key}`);
             });
 
-
+            // Pedir el historial de eventos de un dispisitivo
+            // Evento para recibir la informacion LED_SEND_EVENTS_[nombre del dispositivo]
+            Object.keys(Dispositivos).forEach(key => {
+                this.getEvents(socket, `LED_GET_EVENTS_${key}`);
+            });
         });
     }
 
@@ -52,17 +69,48 @@ export class SocketController {
 
             // Construir la cadena de fecha en formato ISO pero con hora local
             const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.000Z`;
-            await prisma.dispositivo.update({
-                where: { nombre },
+            const existDevice = await prisma.dispositivo.findUnique({ where: { nombre } });
+            if (!existDevice) return;
+            const device = await prisma.dispositivo.update({
+                where: { nombre: existDevice.nombre },
                 data: {
-                    estado: payload === "true",
+                    estado: !existDevice.estado,
                     ultimaActualizacion: formattedDate,
+                }
+            });
+
+            await prisma.evento.create({
+                data: {
+                    accion: payload,
+                    fecha: formattedDate,
+                    id_dispositivo: device.id,
                 }
             })
 
             const pub = mqtt.connect(this.mqttUrl);
             await pub.publishAsync(event, (payload) ? payload : "");
             pub.end();
+        })
+    }
+
+    private getDb(socket: SocketClient, event: string) {
+        socket.on(event, async (payload) => {
+            const deviceName = event.split("_")[3];
+            const info = await prisma.dispositivo.findUnique({ where: { nombre: deviceName } });
+            socket.emit(`LED_SEND_INFO_${deviceName}`, JSON.stringify(info));
+        })
+    }
+
+    private getEvents(socket: SocketClient, event: string) {
+        socket.on(event, async (payload) => {
+            const deviceName = event.split("_")[3];
+            const device = await prisma.dispositivo.findUnique({ where: { nombre: deviceName } })
+            if (!device) return;
+            const events = await prisma.evento.findMany({
+                where: { id_dispositivo: device.id }
+            });
+
+            socket.emit(`LED_SEND_EVENTS_${deviceName}`, JSON.stringify(events))
         })
     }
 }
