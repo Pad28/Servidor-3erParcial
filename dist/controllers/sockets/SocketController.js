@@ -24,11 +24,28 @@ class SocketController {
     listen() {
         return __awaiter(this, void 0, void 0, function* () {
             this.socketServer.on("connection", (socket) => {
+                // Pedir estado actual del dispositivo
                 Object.keys(enums_1.Dispositivos).forEach(key => {
                     this.get(socket, `LED_GET_ESTADO_${key}`);
                 });
+                // Pedir informacion del dispositivo desde la base de datos, envia la informacion en formato JSON
+                // Evento para recibir la informacion LED_SEND_INFO_[nombre del dispositivo]
+                Object.keys(enums_1.Dispositivos).forEach(key => {
+                    this.getDb(socket, `LED_GET_INFO_${key}`);
+                });
+                // Invierte el estado del dispositivo(true/false), como payload recibe uno de estos valores:
+                //   ENCENDIDO
+                //   APAGADO
+                //   ABIERTO
+                //   CERRADO
+                // El MQTT tiene que estar subscrito a un topic con el mismo nombre
                 Object.keys(enums_1.Dispositivos).forEach(key => {
                     this.set(socket, `LED_SET_ESTADO_${key}`);
+                });
+                // Pedir el historial de eventos de un dispisitivo
+                // Evento para recibir la informacion LED_SEND_EVENTS_[nombre del dispositivo]
+                Object.keys(enums_1.Dispositivos).forEach(key => {
+                    this.getEvents(socket, `LED_GET_EVENTS_${key}`);
                 });
             });
         });
@@ -54,16 +71,45 @@ class SocketController {
             const seconds = String(date.getSeconds()).padStart(2, '0');
             // Construir la cadena de fecha en formato ISO pero con hora local
             const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.000Z`;
-            yield mysql_1.prisma.dispositivo.update({
-                where: { nombre },
+            const existDevice = yield mysql_1.prisma.dispositivo.findUnique({ where: { nombre } });
+            if (!existDevice)
+                return;
+            const device = yield mysql_1.prisma.dispositivo.update({
+                where: { nombre: existDevice.nombre },
                 data: {
-                    estado: payload === "true",
+                    estado: !existDevice.estado,
                     ultimaActualizacion: formattedDate,
+                }
+            });
+            yield mysql_1.prisma.evento.create({
+                data: {
+                    accion: payload,
+                    fecha: formattedDate,
+                    id_dispositivo: device.id,
                 }
             });
             const pub = mqtt_1.default.connect(this.mqttUrl);
             yield pub.publishAsync(event, (payload) ? payload : "");
             pub.end();
+        }));
+    }
+    getDb(socket, event) {
+        socket.on(event, (payload) => __awaiter(this, void 0, void 0, function* () {
+            const deviceName = event.split("_")[3];
+            const info = yield mysql_1.prisma.dispositivo.findUnique({ where: { nombre: deviceName } });
+            socket.emit(`LED_SEND_INFO_${deviceName}`, JSON.stringify(info));
+        }));
+    }
+    getEvents(socket, event) {
+        socket.on(event, (payload) => __awaiter(this, void 0, void 0, function* () {
+            const deviceName = event.split("_")[3];
+            const device = yield mysql_1.prisma.dispositivo.findUnique({ where: { nombre: deviceName } });
+            if (!device)
+                return;
+            const events = yield mysql_1.prisma.evento.findMany({
+                where: { id_dispositivo: device.id }
+            });
+            socket.emit(`LED_SEND_EVENTS_${deviceName}`, JSON.stringify(events));
         }));
     }
 }
