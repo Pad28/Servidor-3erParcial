@@ -5,13 +5,13 @@ var Dispositivos;
 (function (Dispositivos) {
     Dispositivos["PERCIANAS"] = "PERCIANAS";
     Dispositivos["ALARMA"] = "ALARMA";
-    Dispositivos["ALARMA_BEBE"] = "ALARMA_BEBE";
-    Dispositivos["PUERTA_MASCOTA"] = "PUERTA_MASCOTA";
+    Dispositivos["ALARMABEBE"] = "ALARMA_BEBE";
+    Dispositivos["PUERTAMASCOTA"] = "PUERTA_MASCOTA";
     Dispositivos["TENDEDERO"] = "TENDEDERO";
     Dispositivos["JARDIN"] = "JARDIN";
     Dispositivos["LUZ"] = "LUZ";
     Dispositivos["ENERGIA"] = "ENERGIA";
-    Dispositivos["DISPENSADOR_ALIMENTOS"] = "DISPENSADOR_ALIMENTOS";
+    Dispositivos["DISPENSADORALIMENTOS"] = "DISPENSADORALIMENTOS";
     Dispositivos["AGUA"] = "AGUA";
     Dispositivos["TIMBRE"] = "TIMBRE";
     Dispositivos["TEMPERATURA"] = "TEMPERATURA";
@@ -20,8 +20,8 @@ var Dispositivos;
     Dispositivos["PUERTA"] = "PUERTA";
     Dispositivos["ESCALERAS"] = "ESCALERAS";
     Dispositivos["REFRIGERADOR"] = "REFRIGERADOR";
-    Dispositivos["DETECTOR_HUMO"] = "DETECTOR_HUMO";
-    Dispositivos["DETECTOR_GAS"] = "DETECTOR_GAS";
+    Dispositivos["DETECTORHUMO"] = "DETECTOR_HUMO";
+    Dispositivos["DETECTORGAS"] = "DETECTOR_GAS";
 })(Dispositivos || (exports.Dispositivos = Dispositivos = {}));
 var Events_get_mqtt;
 (function (Events_get_mqtt) {
