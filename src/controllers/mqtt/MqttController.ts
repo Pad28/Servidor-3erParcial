@@ -63,7 +63,7 @@ export class MqttController {
                     const pub = mqtt.connect(this.mqttUrl);
                     await pub.publishAsync(
                         `LED_SEND_DB_${deviceName}`,
-                        JSON.stringify(dispositivo)
+                        Buffer.from(JSON.stringify(dispositivo)),
                     );
                     console.log(`topic publicado: LED_SEND_DB_${deviceName}`);
                     await pub.endAsync();

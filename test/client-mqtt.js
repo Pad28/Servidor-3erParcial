@@ -1,7 +1,7 @@
 const mqtt = require("mqtt");
 
-const topic_subscribe = "LED_SEND_ESTADO_MQTT_ALARMA";
-const topic_publish = "LED_GET_ESTADO_ALARMA";
+const topic_subscribe = "LED_SEND_DB_ALARMA";
+const topic_publish = "LED_GET_DB_ALARMA";
 const payload = "";
 
 // const client = mqtt.connect("mqtt://isistemas.upt.edu.mx:22245");
@@ -15,6 +15,7 @@ client.on("message", (topic, payload) => {
 
     if (topic === topic_subscribe) {
         console.log(JSON.parse(payload.toString()));
-
+        client.end();
     }
+
 })
