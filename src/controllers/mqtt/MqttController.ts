@@ -48,7 +48,8 @@ export class MqttController {
 
                 // Pedir la informacion del dispositivo a la base de datos
                 if (Object.keys(Events_get_db_mqtt).includes(packet.topic)) {
-                    const deviceName = packet.topic.split("_")[1];
+
+                    const deviceName = packet.topic.split("_")[3];
                     const dispositivo = await prisma.dispositivo.findUnique({
                         where: { nombre: deviceName }
                     });
@@ -56,7 +57,7 @@ export class MqttController {
 
                     const pub = mqtt.connect(this.mqttUrl);
                     await pub.publishAsync(
-                        `LED_SEND_DB_MQTT_${deviceName}`,
+                        `LED_SEND_DB_${deviceName}`,
                         JSON.stringify(dispositivo)
                     );
                     await pub.endAsync();

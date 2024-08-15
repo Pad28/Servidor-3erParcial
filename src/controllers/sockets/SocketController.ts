@@ -95,8 +95,11 @@ export class SocketController {
 
     private getDb(socket: SocketClient, event: string) {
         socket.on(event, async (payload) => {
+            console.log(event);
+
             const deviceName = event.split("_")[3];
             const info = await prisma.dispositivo.findUnique({ where: { nombre: deviceName } });
+            console.log(info);
             socket.emit(`LED_SEND_INFO_${deviceName}`, JSON.stringify(info));
         })
     }

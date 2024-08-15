@@ -46,14 +46,14 @@ class MqttController {
                     }
                     // Pedir la informacion del dispositivo a la base de datos
                     if (Object.keys(enums_1.Events_get_db_mqtt).includes(packet.topic)) {
-                        const deviceName = packet.topic.split("_")[1];
+                        const deviceName = packet.topic.split("_")[3];
                         const dispositivo = yield mysql_1.prisma.dispositivo.findUnique({
                             where: { nombre: deviceName }
                         });
                         if (!dispositivo)
                             return;
                         const pub = mqtt_1.default.connect(this.mqttUrl);
-                        yield pub.publishAsync(`LED_SEND_DB_MQTT_${deviceName}`, JSON.stringify(dispositivo));
+                        yield pub.publishAsync(`LED_SEND_DB_${deviceName}`, JSON.stringify(dispositivo));
                         yield pub.endAsync();
                     }
                     if (packet.topic === enums_1.Events_change_db_mqtt.LED_CHANGE_DB) {
