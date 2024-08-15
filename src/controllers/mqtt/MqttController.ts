@@ -53,9 +53,11 @@ export class MqttController {
                     const dispositivo = await prisma.dispositivo.findUnique({
                         where: { nombre: deviceName }
                     });
-                    console.log(deviceName);
-                    console.log(dispositivo);
 
+                    console.log(JSON.stringify({
+                        deviceName,
+                        info: dispositivo
+                    }, null, 5));
                     if (!dispositivo) return;
 
                     const pub = mqtt.connect(this.mqttUrl);
@@ -63,6 +65,7 @@ export class MqttController {
                         `LED_SEND_DB_${deviceName}`,
                         JSON.stringify(dispositivo)
                     );
+                    console.log(`topic publicado: LED_SEND_DB_${deviceName}`);
                     await pub.endAsync();
                 }
 

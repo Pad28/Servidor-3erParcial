@@ -1,23 +1,19 @@
 const mqtt = require("mqtt");
 
-// console.log(JSON.stringify({
-//     dispositivo: "TINACO",
-//     columna: "nivel_agua",
-//     valor: "20.1",
-//     tipo: "float",
-// }, null, 5));
+const topic_subscribe = "LED_SEND_DB_ALARMA";
+const topic_publish = "LED_GET_DB_ALARMA";
+const payload = "";
 
-
+// const client = mqtt.connect("mqtt://isistemas.upt.edu.mx:22245");
 const client = mqtt.connect("mqtt://localhost:8085");
 client.on("connect", () => {
-    client.subscribe("LED_SEND_DB_ALARMA");
-    client.publish("LED_GET_DB_ALARMA", "");
+    client.subscribe(topic_subscribe);
+    client.publish(topic_publish, payload);
 });
 
 client.on("message", (topic, payload) => {
-    console.log(topic);
 
-    if (topic === "LED_SEND_DB_ALARMA") {
+    if (topic === topic_subscribe) {
         console.log(payload.toString());
 
     }

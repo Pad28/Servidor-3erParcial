@@ -50,12 +50,15 @@ class MqttController {
                         const dispositivo = yield mysql_1.prisma.dispositivo.findUnique({
                             where: { nombre: deviceName }
                         });
-                        console.log(deviceName);
-                        console.log(dispositivo);
+                        console.log(JSON.stringify({
+                            deviceName,
+                            info: dispositivo
+                        }, null, 5));
                         if (!dispositivo)
                             return;
                         const pub = mqtt_1.default.connect(this.mqttUrl);
                         yield pub.publishAsync(`LED_SEND_DB_${deviceName}`, JSON.stringify(dispositivo));
+                        console.log(`topic publicado: LED_SEND_DB_${deviceName}`);
                         yield pub.endAsync();
                     }
                     if (packet.topic === enums_1.Events_change_db_mqtt.LED_CHANGE_DB) {
