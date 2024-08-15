@@ -52,7 +52,6 @@ class SocketController {
     }
     get(socket, event) {
         socket.on(event, (payload) => __awaiter(this, void 0, void 0, function* () {
-            console.log(event, payload);
             const pub = mqtt_1.default.connect(this.mqttUrl);
             yield pub.publishAsync(event, (payload) ? payload : "");
             pub.end();
@@ -95,10 +94,8 @@ class SocketController {
     }
     getDb(socket, event) {
         socket.on(event, (payload) => __awaiter(this, void 0, void 0, function* () {
-            console.log(event);
             const deviceName = event.split("_")[3];
             const info = yield mysql_1.prisma.dispositivo.findUnique({ where: { nombre: deviceName } });
-            console.log(info);
             socket.emit(`LED_SEND_INFO_${deviceName}`, JSON.stringify(info));
         }));
     }
