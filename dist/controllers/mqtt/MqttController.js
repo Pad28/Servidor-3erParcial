@@ -50,6 +50,8 @@ class MqttController {
                         const dispositivo = yield mysql_1.prisma.dispositivo.findUnique({
                             where: { nombre: deviceName }
                         });
+                        console.log(deviceName);
+                        console.log(dispositivo);
                         if (!dispositivo)
                             return;
                         const pub = mqtt_1.default.connect(this.mqttUrl);
