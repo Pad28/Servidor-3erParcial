@@ -14,7 +14,7 @@ client.on("connect", () => {
 client.on("message", (topic, payload) => {
 
     if (topic === topic_subscribe) {
-        console.log(payload.toString());
+        console.log(JSON.parse(payload.toString()));
 
     }
 })

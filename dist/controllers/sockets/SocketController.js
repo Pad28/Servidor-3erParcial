@@ -59,37 +59,42 @@ class SocketController {
     }
     set(socket, event) {
         socket.on(event, (payload) => __awaiter(this, void 0, void 0, function* () {
-            const nombre = event.split("_")[3];
-            const date = new Date();
-            // Obtener la fecha y hora local
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0'); // Mes de 0 a 11
-            const day = String(date.getDate()).padStart(2, '0');
-            const hours = String(date.getHours()).padStart(2, '0');
-            const minutes = String(date.getMinutes()).padStart(2, '0');
-            const seconds = String(date.getSeconds()).padStart(2, '0');
-            // Construir la cadena de fecha en formato ISO pero con hora local
-            const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.000Z`;
-            const existDevice = yield mysql_1.prisma.dispositivo.findUnique({ where: { nombre } });
-            if (!existDevice)
-                return;
-            const device = yield mysql_1.prisma.dispositivo.update({
-                where: { nombre: existDevice.nombre },
-                data: {
-                    estado: !existDevice.estado,
-                    ultimaActualizacion: formattedDate,
-                }
-            });
-            yield mysql_1.prisma.evento.create({
-                data: {
-                    accion: payload,
-                    fecha: formattedDate,
-                    id_dispositivo: device.id,
-                }
-            });
-            const pub = mqtt_1.default.connect(this.mqttUrl);
-            yield pub.publishAsync(event, (payload) ? payload : "");
-            pub.end();
+            try {
+                const nombre = event.split("_")[3];
+                const date = new Date();
+                // Obtener la fecha y hora local
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0'); // Mes de 0 a 11
+                const day = String(date.getDate()).padStart(2, '0');
+                const hours = String(date.getHours()).padStart(2, '0');
+                const minutes = String(date.getMinutes()).padStart(2, '0');
+                const seconds = String(date.getSeconds()).padStart(2, '0');
+                // Construir la cadena de fecha en formato ISO pero con hora local
+                const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.000Z`;
+                const existDevice = yield mysql_1.prisma.dispositivo.findUnique({ where: { nombre } });
+                if (!existDevice)
+                    return;
+                const device = yield mysql_1.prisma.dispositivo.update({
+                    where: { nombre: existDevice.nombre },
+                    data: {
+                        estado: !existDevice.estado,
+                        ultimaActualizacion: formattedDate,
+                    }
+                });
+                yield mysql_1.prisma.evento.create({
+                    data: {
+                        accion: payload,
+                        fecha: formattedDate,
+                        id_dispositivo: device.id,
+                    }
+                });
+                const pub = mqtt_1.default.connect(this.mqttUrl);
+                yield pub.publishAsync(event, (payload) ? payload : "");
+                pub.end();
+            }
+            catch (error) {
+                console.log(error);
+            }
         }));
     }
     getDb(socket, event) {
