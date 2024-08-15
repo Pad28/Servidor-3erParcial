@@ -34,10 +34,11 @@ class MqttController {
                     }
                     // Pedir el estado del dispositivo a la base de datos
                     if (Object.keys(enums_1.Events_get_mqtt).includes(packet.topic)) {
-                        const deviceName = packet.topic.split("_")[1];
+                        const deviceName = packet.topic.split("_")[3];
                         const dispositivo = yield mysql_1.prisma.dispositivo.findUnique({
                             where: { nombre: deviceName }
                         });
+                        console.log(packet.topic, deviceName);
                         if (!dispositivo)
                             return;
                         const pub = mqtt_1.default.connect(this.mqttUrl);

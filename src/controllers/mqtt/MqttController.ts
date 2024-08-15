@@ -1,6 +1,6 @@
 import mosca from "mosca";
 import { Server } from "socket.io";
-import { Dispositivos, Events_change_db_mqtt, Events_get_db_mqtt, Events_get_mqtt, Events_send_mqtt } from "../../config/enums";
+import { Events_change_db_mqtt, Events_get_db_mqtt, Events_get_mqtt, Events_send_mqtt } from "../../config/enums";
 import mqtt from 'mqtt';
 import { prisma } from "../../data/mysql";
 
@@ -32,10 +32,14 @@ export class MqttController {
 
                 // Pedir el estado del dispositivo a la base de datos
                 if (Object.keys(Events_get_mqtt).includes(packet.topic)) {
-                    const deviceName = packet.topic.split("_")[1];
+                    const deviceName = packet.topic.split("_")[3];
                     const dispositivo = await prisma.dispositivo.findUnique({
                         where: { nombre: deviceName }
                     });
+
+                    console.log(packet.topic, deviceName);
+
+
                     if (!dispositivo) return;
 
                     const pub = mqtt.connect(this.mqttUrl);

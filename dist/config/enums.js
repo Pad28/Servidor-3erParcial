@@ -28,7 +28,7 @@ var Events_get_mqtt;
     Events_get_mqtt["LED_GET_ESTADO_PERCIANAS"] = "GET_PERCIANAS";
     Events_get_mqtt["LED_GET_ESTADO_ALARMA"] = "GET_ALARMA";
     Events_get_mqtt["LED_GET_ESTADO_ALARMABEBE"] = "GET_ALARMABEBE";
-    Events_get_mqtt["LED_GET_ESTADO_PUERTA_MASCOTA"] = "GET_PUERTAMASCOTA";
+    Events_get_mqtt["LED_GET_ESTADO_PUERTAMASCOTA"] = "GET_PUERTAMASCOTA";
     Events_get_mqtt["LED_GET_ESTADO_TENDEDERO"] = "GET_TENDEDERO";
     Events_get_mqtt["LED_GET_ESTADO_JARDIN"] = "GET_JARDIN";
     Events_get_mqtt["LED_GET_ESTADO_LUZ"] = "GET_LUZ";
