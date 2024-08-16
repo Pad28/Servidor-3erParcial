@@ -47,6 +47,8 @@ class SocketController {
                 Object.keys(enums_1.Dispositivos).forEach(key => {
                     this.getEvents(socket, `LED_GET_EVENTS_${key}`);
                 });
+                // Cambiar una columan de la base de datos desde websocket LED_SOCKET_CHANGE_DB
+                this.setDb(socket, `LED_SOCKET_CHANGE_DB`);
             });
         });
     }
@@ -114,6 +116,36 @@ class SocketController {
                 where: { id_dispositivo: device.id }
             });
             socket.emit(`LED_SEND_EVENTS_${deviceName}`, JSON.stringify(events));
+        }));
+    }
+    setDb(socket, event) {
+        socket.on(event, (payload) => __awaiter(this, void 0, void 0, function* () {
+            try {
+                const data = JSON.parse(payload);
+                const newValue = (data.tipo === "number")
+                    ? parseInt(data.valor)
+                    : (data.tipo === "float")
+                        ? parseFloat(data.valor)
+                        : (data.tipo === "boolean")
+                            ? data.valor === "true"
+                            : data.valor;
+                const result = yield mysql_1.prisma.dispositivo.update({
+                    where: { nombre: data.dispositivo },
+                    data: {
+                        [data.columna]: newValue
+                    }
+                });
+                console.log({
+                    event,
+                    result,
+                });
+                const pub = mqtt_1.default.connect(this.mqttUrl);
+                yield pub.publishAsync(event, JSON.stringify(result));
+                pub.end();
+            }
+            catch (error) {
+                console.log(error);
+            }
         }));
     }
 }

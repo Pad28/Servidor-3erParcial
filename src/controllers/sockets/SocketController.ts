@@ -3,6 +3,7 @@ import mqtt from 'mqtt';
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
 import { Dispositivos } from "../../config/enums";
 import { prisma } from "../../data/mysql";
+import { ChangeDataDevice } from "../mqtt/MqttController";
 
 type SocketClient = Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>;
 export class SocketController {
@@ -40,6 +41,10 @@ export class SocketController {
             Object.keys(Dispositivos).forEach(key => {
                 this.getEvents(socket, `LED_GET_EVENTS_${key}`);
             });
+
+            // Cambiar una columan de la base de datos desde websocket LED_SOCKET_CHANGE_DB
+            this.setDb(socket, `LED_SOCKET_CHANGE_DB`);
+
         });
     }
 
@@ -117,5 +122,41 @@ export class SocketController {
 
             socket.emit(`LED_SEND_EVENTS_${deviceName}`, JSON.stringify(events))
         })
+    }
+
+    private setDb(socket: SocketClient, event: string) {
+        socket.on(event, async (payload) => {
+            try {
+                const data = JSON.parse(payload) as ChangeDataDevice;
+                const newValue = (data.tipo === "number")
+                    ? parseInt(data.valor)
+                    : (data.tipo === "float")
+                        ? parseFloat(data.valor)
+                        : (data.tipo === "boolean")
+                            ? data.valor === "true"
+                            : data.valor;
+
+
+                const result = await prisma.dispositivo.update({
+                    where: { nombre: data.dispositivo },
+                    data: {
+                        [data.columna]: newValue
+                    }
+                });
+
+                console.log({
+                    event,
+                    result,
+                });
+
+                const pub = mqtt.connect(this.mqttUrl);
+                await pub.publishAsync(event, JSON.stringify(result));
+                pub.end();
+            } catch (error) {
+                console.log(error);
+
+            }
+
+        });
     }
 }

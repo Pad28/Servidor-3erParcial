@@ -4,7 +4,7 @@ import { Events_change_db_mqtt, Events_get_db_mqtt, Events_get_mqtt, Events_send
 import mqtt from 'mqtt';
 import { prisma } from "../../data/mysql";
 
-type ChangeDataDevice = {
+export type ChangeDataDevice = {
     dispositivo: string;
     columna: string;
     valor: string;
