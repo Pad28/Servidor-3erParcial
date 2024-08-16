@@ -1,21 +1,21 @@
 const mqtt = require("mqtt");
 
-const topic_subscribe = "LED_SEND_ESTADO_MQTT_ALARMA";
+const topic_subscribe = "LED_SEND_EVENTS_PERCIANAS";
 const topic_publish = "LED_GET_ESTADO_ALARMA";
 const payload = "";
 
-const client = mqtt.connect("mqtt://isistemas.upt.edu.mx:22245");
+const client = mqtt.connect("mqtt://187.141.55.141:22245");
+console.log("Ok");
+
 // const client = mqtt.connect("mqtt://localhost:8085");
 client.on("connect", () => {
-    client.subscribe(topic_subscribe);
-    client.publish(topic_publish, payload);
+    const aux = client.subscribe(topic_subscribe);
+    console.log(aux);
+
+    // client.publish(topic_publish, payload);
 });
 
 client.on("message", (topic, payload) => {
-
-    if (topic === topic_subscribe) {
-        console.log(JSON.parse(payload.toString()));
-        client.end();
-    }
-
+    console.log(payload.toString());
+    client.end();
 })

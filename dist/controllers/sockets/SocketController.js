@@ -126,6 +126,7 @@ class SocketController {
     setDb(socket, event) {
         socket.on(event, (payload) => __awaiter(this, void 0, void 0, function* () {
             try {
+                console.log(payload);
                 const data = JSON.parse(payload);
                 const newValue = (data.tipo === "number")
                     ? parseInt(data.valor)

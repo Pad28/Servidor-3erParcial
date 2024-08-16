@@ -133,6 +133,8 @@ export class SocketController {
     private setDb(socket: SocketClient, event: string) {
         socket.on(event, async (payload) => {
             try {
+                console.log(payload);
+
                 const data = JSON.parse(payload) as ChangeDataDevice;
                 const newValue = (data.tipo === "number")
                     ? parseInt(data.valor)
