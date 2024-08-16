@@ -125,6 +125,7 @@ export class SocketController {
                 where: { id_dispositivo: device.id }
             });
 
+            console.log(JSON.stringify(events));
             socket.emit(`LED_SEND_EVENTS_${deviceName}`, JSON.stringify(events))
         })
     }

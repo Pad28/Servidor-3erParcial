@@ -119,6 +119,7 @@ class SocketController {
             const events = yield mysql_1.prisma.evento.findMany({
                 where: { id_dispositivo: device.id }
             });
+            console.log(JSON.stringify(events));
             socket.emit(`LED_SEND_EVENTS_${deviceName}`, JSON.stringify(events));
         }));
     }
