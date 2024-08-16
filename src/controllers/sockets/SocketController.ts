@@ -58,7 +58,6 @@ export class SocketController {
     }
 
     private set(socket: SocketClient, event: string) {
-
         socket.on(event, async (payload) => {
             try {
                 const nombre = event.split("_")[3];
@@ -99,7 +98,7 @@ export class SocketController {
                 })
 
                 const pub = mqtt.connect(this.mqttUrl);
-                await pub.publishAsync(event, (payload) ? payload : "");
+                await pub.publishAsync(event, JSON.stringify(device));
                 pub.end();
             } catch (error) {
                 console.log(error);

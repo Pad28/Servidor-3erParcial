@@ -95,7 +95,7 @@ class SocketController {
                     }
                 });
                 const pub = mqtt_1.default.connect(this.mqttUrl);
-                yield pub.publishAsync(event, (payload) ? payload : "");
+                yield pub.publishAsync(event, JSON.stringify(device));
                 pub.end();
             }
             catch (error) {
