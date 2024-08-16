@@ -83,6 +83,10 @@ class SocketController {
                         ultimaActualizacion: formattedDate,
                     }
                 });
+                console.log({
+                    event,
+                    device,
+                });
                 yield mysql_1.prisma.evento.create({
                     data: {
                         accion: payload,

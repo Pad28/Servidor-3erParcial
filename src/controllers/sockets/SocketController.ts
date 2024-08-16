@@ -84,6 +84,12 @@ export class SocketController {
                     }
                 });
 
+                console.log({
+                    event,
+                    device,
+                });
+
+
                 await prisma.evento.create({
                     data: {
                         accion: payload,
